@@ -1,0 +1,63 @@
+#pragma once
+#include <mysqlx/xdevapi.h>
+#include <iostream>
+using namespace std;
+
+class DataBase{
+public:
+    DataBase() {
+
+    }
+
+    mysqlx::Session sqlConnection() {
+        mysqlx::Session session("mysqlx://remote_root:123@26.74.255.166:33060/carwash");
+        cout << "Connected to MySQL successfully!" << endl;
+        return session;
+    }
+
+    bool addTelegramUser(string telegramId, string name) {
+        auto session = sqlConnection();
+        auto query = session.sql("INSERT INTO telegram_users(telegram_id, name) VALUES (?, ?)");
+        query.bind(telegramId, name);
+        query.execute();
+        return setUserStatus(telegramId, 1);
+    }
+
+    bool setUserStatus(string telegramId, int status) {
+        auto session = sqlConnection();
+        auto query = session.sql("INSERT INTO users_status(telegram_id, status) VALUES (?, ?)");
+        query.bind(telegramId, status);
+        query.execute();
+        return true;
+    }
+
+    void outTelegramUsers() {
+        string queryText = 
+            R"(SELECT 
+                    telegram_users.*,
+                    users_status.status,
+                    DATE_FORMAT(users_status.date, '%d.%m.%y %h:%i')
+                FROM 
+                    telegram_users
+                    LEFT JOIN users_status
+                    ON telegram_users.telegram_id = users_status.telegram_id)";
+
+        auto session = sqlConnection();
+        auto result = session.sql(queryText).execute();
+        while (auto row = result.fetchOne()) {
+            cout << row[0] << ' ' << row[1] << ' ' << row[2] << ' ' << row[3] << endl;
+        }
+    }
+
+    void sqlExamples() {
+        try {
+            //addTelegramUser("kek", "chebureck");
+            outTelegramUsers();
+        }
+        catch (const mysqlx::Error& err) {
+            std::cerr << "SQL Error: " << err.what() << std::endl;
+        }
+    }
+};
+
+
