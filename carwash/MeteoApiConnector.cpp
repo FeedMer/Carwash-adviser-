@@ -25,6 +25,7 @@ string MeteoApiConnector::makeRequest() {
         return "";
     }
 
+    // TODO: ssl verification fix
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
 
