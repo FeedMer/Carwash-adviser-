@@ -1,7 +1,7 @@
-#include "WeatherApi.h"
 #include <curl/curl.h>
 #include <iostream>
 #include <string>
+#include "WeatherApi.h"
 using namespace std;
 
 size_t MeteoApiConnector::writeCallback(void* contents, size_t size, size_t nmemb, void* userp) {
@@ -51,5 +51,14 @@ string MeteoApiConnector::makeRequest() {
     return readBuffer;
 }
 
-
-
+Weather MeteoApiConnector::getCurrentWeather() {
+    Weather w;
+    string response = makeRequest();
+    if (response.empty()) {
+        cerr << "RESPONSE IS EMPTRY";
+        return w;
+    }
+    json j = json::parse(response);
+    w = j["current"].get<Weather>();
+    return w;
+}
