@@ -27,12 +27,18 @@
     <ClCompile Include="Weather.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="DeepseekAPI.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DataBase.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="WeatherApi.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="DeepseekAPI.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

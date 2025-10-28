@@ -132,11 +132,13 @@
   <ItemGroup>
     <ClCompile Include="carwash.cpp" />
     <ClCompile Include="DataBase.cpp" />
+    <ClCompile Include="DeepseekAPI.cpp" />
     <ClCompile Include="MeteoApiConnector.cpp" />
     <ClCompile Include="Weather.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DataBase.h" />
+    <ClInclude Include="DeepseekAPI.h" />
     <ClInclude Include="WeatherApi.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
