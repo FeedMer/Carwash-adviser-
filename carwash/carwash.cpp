@@ -4,10 +4,19 @@
 #include <iostream>
 using namespace std;
 
-int main(){
-    
-    //DataBase db;
+// Просто вызов моих функций
+void gd() {
+    setlocale(LC_ALL, "ru_RU.UTF-8");
+    DeepseekAPI ds;
+    ds.main();
+    cout << ds.result << endl;
+
+    DataBase db;
     //db.sqlExamples();
+    db.addMessage("1", ds.prompt, ds.result);
+}
+
+int main() {
 
     //---request example---
     /*MeteoApiConnector api = MeteoApiConnector(56.51, 53.12);
@@ -15,8 +24,5 @@ int main(){
     cout << w << endl;
     return 0;*/
 
-    setlocale(LC_ALL, "ru_RU.UTF-8");
-    DeepseekAPI ds;
-    ds.main();
-    cout << ds.result << endl;
+    gd();
 }

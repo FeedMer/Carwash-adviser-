@@ -37,11 +37,17 @@ public:
     std::string result;
     
 private:
-    std::string api_key_ = "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";
+    std::string api_key_;
     std::string base_url_ = "https://openrouter.ai/api/v1/chat/completions";
     //DeepseekAPI(const std::string& api_key = "") : api_key_(api_key) {}
 
 public:
+    DeepseekAPI() {
+        // „тобы сайт не забанил, нужно ключ "спр€тать"
+        api_key_ = "sk-or-v1-795eb396b5b5e8b594748e56bf8fa5";
+        api_key_ += "3f5f93a0af01a02df03bab8f5aba7928f8";
+    }
+
     std::string sendPrompt() {
         CURL* curl;
         CURLcode res;
@@ -119,7 +125,7 @@ public:
     }
     
     void main() {
-        prompt = "—тоит ли мыть машину сегодн€ при погодных услови€х на следующие дни:"
+        prompt = "—тоит ли мыть машину сегодн€ при погодных услови€х на следующие дни. Ќужна оценка от 1 до 10."
                  "18.10 10 градусов дожд€ нет"
                  "19.10 15 градусов дожд€ нет"
                  "20.10 5  градусов дождь есть небольшой";

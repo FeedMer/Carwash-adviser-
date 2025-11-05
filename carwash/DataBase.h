@@ -9,12 +9,14 @@ public:
 
     }
 
+    // Создание подключения к базе данных
     mysqlx::Session sqlConnection() {
         mysqlx::Session session("mysqlx://remote_root:123@26.74.255.166:33060/carwash");
         cout << "Connected to MySQL successfully!" << endl;
         return session;
     }
 
+    // Добавление телеграм пользователя
     bool addTelegramUser(string telegramId, string name) {
         auto session = sqlConnection();
         auto query = session.sql("INSERT INTO telegram_users(telegram_id, name) VALUES (?, ?)");
@@ -23,6 +25,7 @@ public:
         return setUserStatus(telegramId, 1);
     }
 
+    // Установка статуса пользователя (1 - активный, 0 - неактивный)
     bool setUserStatus(string telegramId, int status) {
         auto session = sqlConnection();
         auto query = session.sql("INSERT INTO users_status(telegram_id, status) VALUES (?, ?)");
@@ -31,6 +34,16 @@ public:
         return true;
     }
 
+    // Добавление информации об отправленном сообщении
+    bool addMessage(string telegramId, string prompt, string result) {
+        auto session = sqlConnection();
+        auto query = session.sql("INSERT INTO sending_messages(telegram_id, prompt, result) VALUES (?, ?, ?)");
+        query.bind(telegramId, prompt, result);
+        query.execute();
+        return true;
+    }
+
+    // Посмотреть список пользователей
     void outTelegramUsers() {
         string queryText = 
             R"(SELECT 
