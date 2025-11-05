@@ -8,12 +8,13 @@ using namespace std;
 void gd() {
     setlocale(LC_ALL, "ru_RU.UTF-8");
     DeepseekAPI ds;
-    ds.main();
-    cout << ds.result << endl;
-
     DataBase db;
-    //db.sqlExamples();
-    db.addMessage("1", ds.prompt, ds.result);
+    //ds.main();
+    //cout << ds.result << endl;
+
+    //db.addMessage("1", ds.prompt, ds.result);
+    auto user = db.getUser("1");
+    //db.outTelegramUsers();
 }
 
 int main() {
