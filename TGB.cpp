@@ -30,7 +30,7 @@ TgBot::ReplyKeyboardMarkup::Ptr getMainMenu() {
 }
 
 int main() {
-    TgBot::Bot bot("8212512135:AAFFT4JdYLPXnYQrM_EIJ2EF886LBPEqXdI");
+    TgBot::Bot bot("...");
     bot.getEvents().onCommand("start", [&bot](TgBot::Message::Ptr message) {
         std::string userId = std::to_string(message->from->id);
         std::string name = message->from->firstName;
@@ -98,3 +98,4 @@ int main() {
     }
     return 0;
 }
+
