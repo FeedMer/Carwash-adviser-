@@ -34,19 +34,20 @@ static size_t WriteCallback1(void* contents, size_t size, size_t nmemb, std::str
 
 class DeepseekAPI {
 public:
+    std::string systemPrompt;
     std::string prompt;
     std::string result;
     
 private:
     std::string api_key_;
-    std::string base_url_ = "https://openrouter.ai/api/v1/chat/completions";
+    std::string base_url_ = "https://api.openai.com/v1/chat/completions";
     //DeepseekAPI(const std::string& api_key = "") : api_key_(api_key) {}
 
 public:
     DeepseekAPI() {
         // Чтобы сайт не забанил, нужно ключ "спрятать"
-        api_key_ = "sk-or-v1-795eb396b5b5e8b594748e56bf8fa5";
-        api_key_ += "3f5f93a0af01a02df03bab8f5aba7928f8";
+        api_key_ = "";
+        api_key_ += "";
     }
 
     std::string sendPrompt() {
@@ -58,11 +59,15 @@ public:
         if (curl) {
             // Подготовка JSON данных
             json request_data;
-            request_data["model"] = "tngtech/deepseek-r1t2-chimera:free";
+            request_data["model"] = "gpt-5.1";
             request_data["messages"] = json::array();
             request_data["messages"][0] = {
                 {"role", "user"},
                 {"content", prompt}
+            };
+            request_data["messages"][1] = {
+                {"role", "system"},
+                {"content", systemPrompt}
             };
             request_data["stream"] = false;
 
@@ -144,13 +149,18 @@ public:
     }
     
     void main() {
-        prompt = "Ты автолюбитель. Тебе нравится держать машину в чистоте, но не нравится, что после чистки машины сразу пошёл дождь."
-                 "Ты живешь в Ижевске. Тебе необходимо на основании информации о погоде решить стоит ли тебе мыть машину сегодня."
-                 "В тексте ответа не используй дополнительных символов."
-                 "Текст ответа ограничен 256 символами. Нужно пояснение с описанием погоды."
-                 "Вот погодные условия на следующие дни. Нужна оценка от 1 до 10."
+        systemPrompt = "Ты автолюбитель. Тебе нравится держать машину в чистоте, но не нравится, что после чистки машины сразу пошёл дождь."
+                       "В тексте ответа не используй дополнительных символов."
+                       "Текст ответа ограничен 256 символами. Нужно пояснение с описанием погоды."
+                       "Нужна оценка от 1 до 10."
+                       "Ты живешь в Ижевске. Ответ дай на английском.";
+
+        prompt = "Тебе необходимо на основании информации о погоде решить стоит ли тебе мыть машину сегодня."
+                 "Вот погодные условия на следующие дни. "
                  + ГрустнаяПогода();
+
         prompt = win1251_to_utf8(prompt);
+        systemPrompt = win1251_to_utf8(systemPrompt);
         result = sendPrompt();
         result = parseResponse(result);
     }

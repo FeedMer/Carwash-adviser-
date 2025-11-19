@@ -26,4 +26,9 @@ int main() {
     return 0;*/
 
     gd();
+
+    // Не удалять, т.к. закрывается консоль в .exe
+    cout << "It works!";
+    system("pause");
+    return 0;
 }
