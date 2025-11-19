@@ -9,12 +9,13 @@ void gd() {
     setlocale(LC_ALL, "ru_RU.UTF-8");
     DeepseekAPI ds;
     DataBase db;
-    ds.main();
+    //ds.main();
     cout << ds.result << endl;
 
     //db.addMessage("1", ds.prompt, ds.result);
     //auto user = db.getUser("1");
-    //db.outTelegramUsers();
+    db.addTelegramUser("test", "test");
+    db.outTelegramUsers();
 }
 
 int main() {

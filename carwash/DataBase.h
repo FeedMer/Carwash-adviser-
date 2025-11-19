@@ -19,18 +19,24 @@ public:
 
     // Создание подключения к базе данных
     mysqlx::Session sqlConnection() {
-        mysqlx::Session session("mysqlx://remote_root:123@26.74.255.166:33060/carwash");
+        mysqlx::Session session("mysqlx://remote_root:123@MySQL-8.4:33060/carwash");
         cout << "Connected to MySQL successfully!" << endl;
         return session;
     }
 
     // Добавление телеграм пользователя
     bool addTelegramUser(string telegramId, string name) {
-        auto session = sqlConnection();
-        auto query = session.sql("INSERT INTO telegram_users(telegram_id, name) VALUES (?, ?)");
-        query.bind(telegramId, name);
-        query.execute();
-        return setUserStatus(telegramId, 1);
+        try {
+            auto session = sqlConnection();
+            auto query = session.sql("INSERT INTO telegram_users(telegram_id, name) VALUES (?, ?)");
+            query.bind(telegramId, name);
+            query.execute();
+            return setUserStatus(telegramId, 1);
+        }
+        catch (const mysqlx::Error& err) {
+            cout << "Error: " << err.what() << std::endl;
+        }
+        return false;
     }
 
     // Установка статуса пользователя (1 - активный, 0 - неактивный)
@@ -64,10 +70,15 @@ public:
                     LEFT JOIN users_status
                         ON telegram_users.telegram_id = users_status.telegram_id)";
 
-        auto session = sqlConnection();
-        auto result = session.sql(queryText).execute();
-        while (auto row = result.fetchOne()) {
-            cout << row[0] << ' ' << row[1] << ' ' << row[2] << ' ' << row[3] << endl;
+        try {
+            auto session = sqlConnection();
+            auto result = session.sql(queryText).execute();
+            while (auto row = result.fetchOne()) {
+                cout << row[0] << ' ' << row[1] << ' ' << row[2] << ' ' << row[3] << endl;
+            }
+        }
+        catch (const mysqlx::Error& err) {
+            cout << "Error: " << err.what() << std::endl;
         }
     }
 
