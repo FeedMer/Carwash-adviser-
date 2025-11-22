@@ -11,7 +11,7 @@ using json = nlohmann::json;
 
 using namespace std;
 set<long long> subscribers; //вр. бд
-const string BOT_TOKEN = "8212512135:AAFFT4JdYLPXnYQrM_EIJ2EF886LBPEqXdI";
+const string BOT_TOKEN = "TOKEN";
 const string API_URL = "https://api.telegram.org/bot" + BOT_TOKEN + "/";
 
 size_t WriteCallback(void* contents, size_t size, size_t nmemb, string* output) {
@@ -185,3 +185,4 @@ int main() {
 
     return 0;
 }
+
