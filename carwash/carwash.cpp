@@ -14,8 +14,11 @@ void gd() {
 
     //db.addMessage("1", ds.prompt, ds.result);
     //auto user = db.getUser("1");
-    db.addTelegramUser("test", "test");
-    db.outTelegramUsers();
+    //db.addTelegramUser("test", "test");
+    //db.outTelegramUsers();
+    for (auto user : db.usersForMailing()) {
+        cout << user.name << " " << user.telegramId << endl;
+    }
 }
 
 int main() {

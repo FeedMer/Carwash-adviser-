@@ -137,33 +137,40 @@ public:
                     formatted_date
                 FROM (
                     SELECT
-                        tu.telegram_id,
-                        tu.name,
-                        us.status,
-                        DATE_FORMAT(us.date, '%d.%m.%y %H:%i') AS formatted_date,
+                        telegram_users.telegram_id,
+                        telegram_users.name,
+                        users_status.status,
+                        DATE_FORMAT(users_status.date, '%d.%m.%y %H:%i') AS formatted_date,
                         ROW_NUMBER() OVER (
-                            PARTITION BY tu.telegram_id 
-                            ORDER BY us.date DESC
-                        ) AS rn
+                            PARTITION BY telegram_users.telegram_id 
+                            ORDER BY users_status.date DESC
+                        ) AS _row_number
                     FROM 
-                        telegram_users tu
-                        LEFT JOIN users_status us
-                            ON tu.telegram_id = us.telegram_id
+                        telegram_users AS telegram_users
+                        LEFT JOIN users_status AS users_status
+                            ON telegram_users.telegram_id = users_status.telegram_id
                 ) AS ranked
-                WHERE rn = 1 AND status = 1)";
+                WHERE _row_number <= 1 AND status = 1)";
 
-        auto session = sqlConnection();
-        auto query = session.sql(queryText);
-        mysqlx::SqlResult result = query.execute();
+        try {
+            auto session = sqlConnection();
+            auto query = session.sql(queryText);
+            mysqlx::SqlResult result = query.execute();
 
-        while (auto row = result.fetchOne()) {
-            TelegramUser user;
-            user.telegramId = string(row[0]);
-            user.name = string(row[1]);
-            user.status = 1;
-            users.push_back(user);
+            while (auto row = result.fetchOne()) {
+                TelegramUser user;
+                user.telegramId = string(row[0]);
+                user.name = string(row[1]);
+                user.status = 1;
+                users.push_back(user);
+            }
         }
-
+        catch (const mysqlx::Error& e) {
+            cerr << "MySQL error: " << e.what() << endl;
+        }
+        catch (const exception& e) {
+            cerr << "Error: " << e.what() << endl;
+        }
         return users;
     }
 
