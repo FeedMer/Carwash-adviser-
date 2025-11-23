@@ -137,6 +137,7 @@
     <ClCompile Include="DataBase.cpp" />
     <ClCompile Include="DeepseekAPI.cpp" />
     <ClCompile Include="MeteoApiConnector.cpp" />
+    <ClCompile Include="StormGlassConnector.cpp" />
     <ClCompile Include="Weather.cpp" />
   </ItemGroup>
   <ItemGroup>

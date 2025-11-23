@@ -38,3 +38,22 @@ public:
     string makeRequest();
 	Weather getCurrentWeather();
 };
+
+class StormGlassConnector {
+private:
+    string LINK = "https://api.stormglass.io/v2/weather/point";
+    string API_KEY = "";    // read from weather-key.txt
+    double longitude;
+    double latitude;
+    CURL* curl;
+
+    static size_t writeCallback(void* contents, size_t size, size_t nmemb, void* userp);
+
+public:
+    StormGlassConnector(double longitude, double latitude);
+    ~StormGlassConnector();
+
+    string makeRequest();
+    Weather getCurrentWeather();
+    vector<Weather> getWeatherForFiveDays();
+};

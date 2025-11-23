@@ -22,17 +22,31 @@ void gd() {
 }
 
 int main() {
-
     //---request example---
-    /*MeteoApiConnector api = MeteoApiConnector(56.51, 53.12);
+
+    // Текущая погода
+    
+    StormGlassConnector api = StormGlassConnector(56.51, 53.12);
     Weather w = api.getCurrentWeather();
     cout << w << endl;
-    return 0;*/
+    
 
-    gd();
+    // Погода на 5 дней с максимальными осадками за каждый день
+    /*
+    StormGlassConnector api = StormGlassConnector(56.51, 53.12);
+    vector<Weather> fiveDaysWeather = api.getWeatherForFiveDays();
+
+    cout << "Погода на 5 дней (максимальные осадки за день):\n" << endl;
+    for (int i = 0; i < fiveDaysWeather.size(); i++) {
+        cout << "День " << (i + 1) << ":\n";
+        cout << fiveDaysWeather[i] << endl;
+    }
+    */
+
+    // gd();
 
     // Не удалять, т.к. закрывается консоль в .exe
-    cout << "It works!";
+    // cout << "It works!";
     system("pause");
     return 0;
 }
