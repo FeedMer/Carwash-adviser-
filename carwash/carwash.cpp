@@ -9,6 +9,10 @@ void gd() {
     setlocale(LC_ALL, "ru_RU.UTF-8");
     DeepseekAPI ds;
     DataBase db;
+    ///
+    TelegramBot tg;
+    tg.start();
+    ///
     //ds.main();
     cout << ds.result << endl;
 
