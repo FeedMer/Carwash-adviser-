@@ -1,8 +1,9 @@
 ﻿#include "DataBase.h"
 #include "WeatherApi.h"
 #include "DeepseekAPI.h"
-#include "TGBot.h"
 #include <iostream>
+
+#include "TGBot.h"
 using namespace std;
 
 // Просто вызов моих функций
