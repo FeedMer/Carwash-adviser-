@@ -15,7 +15,7 @@ using json = nlohmann::json;
 class TelegramBot {
 private:
     DataBase db;
-    DeepSeek ds;
+    DeepSeekAPI ds;
     std::string bot_token;
     std::string api_url;
     bool running;
