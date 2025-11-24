@@ -8,12 +8,14 @@
 #include <set>
 #include <ctime>
 #include "DataBase.h"
+#include "DeepseekAPI.h"
 
 using json = nlohmann::json;
 
 class TelegramBot {
 private:
     DataBase db;
+    DeepSeek ds;
     std::string bot_token;
     std::string api_url;
     bool running;
@@ -146,14 +148,15 @@ private:
                 if (userNameForDb.empty()) userNameForDb = "User_" + std::to_string(chatId);
 
                 if (text == "/start") {
-                    db.addTelegramUser(std::to_string(chatId), userNameForDb)
+                    db.addTelegramUser(std::to_string(chatId), userNameForDb);
                     sendMessage(chatId, u8"Привет! Мне нужно узнать твоё местоположение:", locationRequestKeyboard());
                 }
                 else if (message.contains("location")) {
                     sendMessage(chatId, u8"Спасибо! Местоположение сохранено.", mainMenu());
                 }
                 else if (text == u8"Стоит ли мыть сегодня?") {
-                    sendMessage(chatId, u8"Пока не сделано", mainMenu());
+                    //sendMessage(chatId, u8"Пока не сделано", mainMenu());
+                    sendMessage(chatId, ds.result, mainMenu());
                 }
                 else if (text == u8"Я помыл машину") {
                     sendMessage(chatId, u8"Окей!", mainMenu());
