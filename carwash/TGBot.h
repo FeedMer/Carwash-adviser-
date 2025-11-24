@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 #include <curl/curl.h>
-#include <json.hpp>
+#include "json.hpp"
 #include <thread>
 #include <chrono>
 #include <set>
@@ -94,7 +94,7 @@ private:
 
             //if (!sentToday) {  // тест уведомлений
             if (!sentToday && weekday == TARGET_DAY && hour == 9 && minute == 00) {
-                for (long long chatId : usersForMailing()) {
+                for (long long chatId : db.usersForMailing()) {
                     sendMessage(chatId, u8"Напоминание! Сегодня время помыть машину");
                 }
                 sentToday = true;
@@ -221,13 +221,11 @@ public:
     }
 };
 
-int main() {
+void main() {
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
     std::cout << "Bot started..." << std::endl;
 
     TelegramBot bot("8212512135:AAFFT4JdYLPXnYQrM_EIJ2EF886LBPEqXdI");
     bot.start();
-
-    return 0;
 }
