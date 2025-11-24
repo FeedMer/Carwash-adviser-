@@ -10,7 +10,7 @@ void gd() {
     DeepseekAPI ds;
     DataBase db;
     ///
-    TelegramBot tg;
+    TelegramBot bot("8212512135:AAFFT4JdYLPXnYQrM_EIJ2EF886LBPEqXdI");
     tg.start();
     ///
     //ds.main();
