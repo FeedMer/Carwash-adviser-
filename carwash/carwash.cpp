@@ -1,6 +1,7 @@
 ﻿#include "DataBase.h"
 #include "WeatherApi.h"
 #include "DeepseekAPI.h"
+#include "TGBot.h"
 #include <iostream>
 using namespace std;
 
@@ -30,6 +31,12 @@ int main() {
     StormGlassConnector api = StormGlassConnector(56.51, 53.12);
     Weather w = api.getCurrentWeather();
     cout << w << endl;
+
+    ///
+    TelegramBot bot("8212512135:AAFFT4JdYLPXnYQrM_EIJ2EF886LBPEqXdI");
+    tg.start();
+    ///
+    cout << "Bot started..." << endl;
 
     // Погода на 5 дней с максимальными осадками за каждый день
     /*
