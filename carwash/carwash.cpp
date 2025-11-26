@@ -29,14 +29,17 @@ int main() {
 
     // Текущая погода
     
-    StormGlassConnector api = StormGlassConnector(56.51, 53.12);
+    /*StormGlassConnector api = StormGlassConnector(56.51, 53.12);
     Weather w = api.getCurrentWeather();
-    cout << w << endl;
+    cout << w << endl;*/
 
     ///
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+    std::cout << "Bot started..." << std::endl;
+
     TelegramBot bot("8212512135:AAFFT4JdYLPXnYQrM_EIJ2EF886LBPEqXdI");
     bot.start();
-    cout << "Bot started..." << endl;
      ///
     
     // Погода на 5 дней с максимальными осадками за каждый день

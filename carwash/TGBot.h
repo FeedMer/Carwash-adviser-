@@ -30,10 +30,14 @@ private:
         CURL* curl = curl_easy_init();
         std::string response;
         if (curl) {
+            // НАСТРОЙКИ SSL
+            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L); // Отключить проверку сертификата
+            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L); // Отключить проверку хоста
+
             curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-            curl_easy_perform(curl);
+            auto res = curl_easy_perform(curl);
             curl_easy_cleanup(curl);
         }
         return response;
@@ -94,8 +98,8 @@ private:
 
             //if (!sentToday) {  // тест уведомлений
             if (!sentToday && weekday == TARGET_DAY && hour == 9 && minute == 00) {
-                for (long long chatId : db.usersForMailing()) {
-                    sendMessage(chatId, u8"Напоминание! Сегодня время помыть машину");
+                for (auto chatId : db.usersForMailing()) {
+                    //sendMessage(chatId.telegramId, u8"Напоминание! Сегодня время помыть машину");
                 }
                 sentToday = true;
             }
@@ -221,11 +225,11 @@ public:
     }
 };
 
-void main() {
-    SetConsoleOutputCP(CP_UTF8);
-    SetConsoleCP(CP_UTF8);
-    std::cout << "Bot started..." << std::endl;
-
-    TelegramBot bot("8212512135:AAFFT4JdYLPXnYQrM_EIJ2EF886LBPEqXdI");
-    bot.start();
-}
+//void main() {
+//    SetConsoleOutputCP(CP_UTF8);
+//    SetConsoleCP(CP_UTF8);
+//    std::cout << "Bot started..." << std::endl;
+//
+//    TelegramBot bot("8212512135:AAFFT4JdYLPXnYQrM_EIJ2EF886LBPEqXdI");
+//    bot.start();
+//}
