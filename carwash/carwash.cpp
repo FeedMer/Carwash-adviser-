@@ -25,34 +25,23 @@ void gd() {
 }
 
 int main() {
+
     //---request example---
+    //MeteoblueConnector mbc = MeteoblueConnector(56.51, 53.12);    // передайте широту и долготу места
+    //vector<Weather> ws = mbc.getSomeWeather(5);                   //передайте колво дней на который хотите сделать прогноз
+    //for (int i = 0; i < 5; i++) {
+    //    cout << ws[i] << endl;
+    //}
 
-    // Текущая погода
-    
-    /*StormGlassConnector api = StormGlassConnector(56.51, 53.12);
-    Weather w = api.getCurrentWeather();
-    cout << w << endl;*/
-
-    ///
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
-    std::cout << "Bot started..." << std::endl;
+    //std::cout << "Bot started..." << std::endl;
 
-    TelegramBot bot("8212512135:AAFFT4JdYLPXnYQrM_EIJ2EF886LBPEqXdI");
-    bot.start();
+    //TelegramBot bot("8212512135:AAFFT4JdYLPXnYQrM_EIJ2EF886LBPEqXdI");
+    //bot.start();
      ///
     
-    // Погода на 5 дней с максимальными осадками за каждый день
-    /*
-    StormGlassConnector api = StormGlassConnector(56.51, 53.12);
-    vector<Weather> fiveDaysWeather = api.getWeatherForFiveDays();
-
-    cout << "Погода на 5 дней (максимальные осадки за день):\n" << endl;
-    for (int i = 0; i < fiveDaysWeather.size(); i++) {
-        cout << "День " << (i + 1) << ":\n";
-        cout << fiveDaysWeather[i] << endl;
-    }
-    */
+    
 
     // gd();
 

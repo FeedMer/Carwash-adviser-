@@ -6,12 +6,13 @@ using namespace std;
 using json = nlohmann::json;
 
 class Weather {
-	string time;
-	double temperature;
-	double windSpeed;
-	int windDirection;
-	double precipitation;
+    string time;
+    double temperature;
+    double windSpeed;
+    int windDirection;
+    double precipitation;
 public:
+    
 	friend void from_json(const json& j, Weather& w);			//deserialisation
 	friend ostream& operator<<(ostream& stream, Weather& w);
 
@@ -20,6 +21,13 @@ public:
 	double getWindSpeed();
 	double getPrecipitation();
 	int getWindDirection();
+
+    void setTime(string time);
+    void setTemperature(double temperature);
+    void setWindSpeed(double windSpeed);
+    void setWindDirection(int windDirection);
+    void setPrecipitation(double precipitation);
+
 };
 
 class MeteoApiConnector {
@@ -39,21 +47,18 @@ public:
 	Weather getCurrentWeather();
 };
 
-class StormGlassConnector {
+class MeteoblueConnector {
 private:
-    string LINK = "https://api.stormglass.io/v2/weather/point";
-    string API_KEY = "";    // read from weather-key.txt
+    std::string LINK = "https://my.meteoblue.com/packages/basic-day?apikey=";
+    string API_KEY = "";
     double longitude;
     double latitude;
     CURL* curl;
-
     static size_t writeCallback(void* contents, size_t size, size_t nmemb, void* userp);
 
 public:
-    StormGlassConnector(double longitude, double latitude);
-    ~StormGlassConnector();
-
-    string makeRequest();
-    Weather getCurrentWeather();
-    vector<Weather> getWeatherForFiveDays();
+    MeteoblueConnector(double longitude, double latitude);
+    ~MeteoblueConnector();
+    string makeRequestOfSomeWeathers(int forecast);
+    vector<Weather> getSomeWeather(int forecast);
 };

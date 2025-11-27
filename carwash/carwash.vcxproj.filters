@@ -30,7 +30,7 @@
     <ClCompile Include="DeepseekAPI.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="StormGlassConnector.cpp">
+    <ClCompile Include="MeteoblueConnector.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>

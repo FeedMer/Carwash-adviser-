@@ -24,6 +24,26 @@ string Weather::getTime() {
 	return time;
 }
 
+void Weather::setTime(string time) {
+	this->time = time;
+}
+
+void Weather::setPrecipitation(double precipitation) {
+	this->precipitation = precipitation;
+}
+
+void Weather::setTemperature(double temperature) {
+	this->temperature = temperature;
+}
+
+void Weather::setWindSpeed(double windSpeed) {
+	this->windSpeed = windSpeed;
+}
+
+void Weather::setWindDirection(int windDirection) {
+	this->windDirection = windDirection;
+}
+
 ostream& operator<<(ostream& stream, Weather& w) {
 	stream << w.time << '\n'
 		<< w.temperature << " celsius\n"
