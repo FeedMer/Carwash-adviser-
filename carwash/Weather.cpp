@@ -47,7 +47,8 @@ void Weather::setWindDirection(int windDirection) {
 ostream& operator<<(ostream& stream, Weather& w) {
 	stream << "day: " << w.time << '\n'
 		<< "temperature: " << w.temperature << " of celsius\n"
-		<< "wind speed: " << w.windSpeed << " km/h , direction: " << w.windDirection << " degree"
+		<< "wind speed: " << w.windSpeed << " km/h , direction: " << w.windDirection << " degree\n"
+		<< "precipitation: " << w.precipitation << " mm"
 		<< endl;
 	return stream;
 }
