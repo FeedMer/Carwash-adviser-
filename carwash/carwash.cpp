@@ -27,8 +27,8 @@ void gd() {
 int main() {
 
     //---request example---
-    //MeteoblueConnector mbc = MeteoblueConnector(56.51, 53.12);    // передайте широту и долготу места
-    //vector<Weather> ws = mbc.getSomeWeather(5);                   //передайте колво дней на который хотите сделать прогноз
+    //MeteoblueConnector mbc = MeteoblueConnector(56.84, 53.20);    // ширина и долгота (для ижевска: 56.84, 53.20)
+    //vector<Weather> ws = mbc.getWeathers(5);                      // аргумент колво дней для запроса
     //for (int i = 0; i < 5; i++) {
     //    cout << ws[i] << endl;
     //}
@@ -39,9 +39,6 @@ int main() {
 
     //TelegramBot bot("8212512135:AAFFT4JdYLPXnYQrM_EIJ2EF886LBPEqXdI");
     //bot.start();
-     ///
-    
-    
 
     // gd();
 

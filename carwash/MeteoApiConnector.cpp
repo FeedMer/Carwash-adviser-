@@ -19,7 +19,7 @@ MeteoApiConnector::~MeteoApiConnector() {
     curl_easy_cleanup(curl);
 }
 
-string MeteoApiConnector::makeRequest() {
+string MeteoApiConnector::makeRequest(int forecast) {
     if (!curl) {
         cerr << "Curl init failed!" << endl;
         return "";
@@ -33,7 +33,8 @@ string MeteoApiConnector::makeRequest() {
     string url = LINK +
         "latitude=" + to_string(latitude) +
         "&longitude=" + to_string(longitude) +
-        "&current=temperature_2m,wind_speed_10m,wind_direction_10m,precipitation";
+        "&daily=temperature_2m_min,precipitation_sum,wind_speed_10m_max,wind_direction_10m_dominant&timezone=Europe/Moscow&forecast_days="
+        + to_string(forecast);
 
     string readBuffer;
 
@@ -51,14 +52,20 @@ string MeteoApiConnector::makeRequest() {
     return readBuffer;
 }
 
-Weather MeteoApiConnector::getCurrentWeather() {
-    Weather w;
-    string response = makeRequest();
+vector<Weather> MeteoApiConnector::getWeathers(int forecast) {
+    vector<Weather> weathers(forecast);
+    string response = makeRequest(forecast);
     if (response.empty()) {
         cerr << "RESPONSE IS EMPTRY";
-        return w;
+        return weathers;
     }
     json j = json::parse(response);
-    w = j["current"].get<Weather>();
-    return w;
+    for (int i = 0; i < forecast; i++) {
+        weathers[i].setTime(j["daily"]["time"][i]);
+        weathers[i].setTemperature(j["daily"]["temperature_2m_min"][i]);
+        weathers[i].setPrecipitation(j["daily"]["precipitation_sum"][i]);
+        weathers[i].setWindSpeed(j["daily"]["wind_speed_10m_max"][i]);
+        weathers[i].setWindDirection(j["daily"]["wind_direction_10m_dominant"][i]);
+    }
+    return weathers;
 }

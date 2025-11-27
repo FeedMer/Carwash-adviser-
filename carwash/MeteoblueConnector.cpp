@@ -22,7 +22,7 @@ MeteoblueConnector::~MeteoblueConnector() {
     curl_easy_cleanup(curl);
 }
 
-string MeteoblueConnector::makeRequestOfSomeWeathers(int forecast) {
+string MeteoblueConnector::makeRequest(int forecast) {
     if (!curl) {
         cerr << "Curl init failed!" << endl;
         return "";
@@ -54,8 +54,8 @@ string MeteoblueConnector::makeRequestOfSomeWeathers(int forecast) {
     return readBuffer;
 }
 
-vector<Weather> MeteoblueConnector::getSomeWeather(int forecast) {
-    string response = makeRequestOfSomeWeathers(forecast);
+vector<Weather> MeteoblueConnector::getWeathers(int forecast) {
+    string response = makeRequest(forecast);
     vector<Weather> weathers(forecast);
     if (response.empty()) {
         cerr << "RESPONSE IS EMPTY" << endl;

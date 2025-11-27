@@ -43,8 +43,8 @@ public:
     MeteoApiConnector(double longitude, double latitude);
     ~MeteoApiConnector();
 
-    string makeRequest();
-	Weather getCurrentWeather();
+    string makeRequest(int forecast);
+	vector<Weather> getWeathers(int forecast);
 };
 
 class MeteoblueConnector {
@@ -55,10 +55,10 @@ private:
     double latitude;
     CURL* curl;
     static size_t writeCallback(void* contents, size_t size, size_t nmemb, void* userp);
+    string makeRequest(int forecast);
 
 public:
     MeteoblueConnector(double longitude, double latitude);
     ~MeteoblueConnector();
-    string makeRequestOfSomeWeathers(int forecast);
-    vector<Weather> getSomeWeather(int forecast);
+    vector<Weather> getWeathers(int forecast);
 };
