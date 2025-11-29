@@ -216,11 +216,15 @@ public:
         systemPrompt = "Ты автолюбитель. Твой собеседник тоже автолюбитель. Вы общаетесь на тему авто. На другие вопросы отнекивайся";
         prompt = text;
 
-        prompt = win1251_to_utf8(prompt);
+        // Уже приходит в utf-8
+        //prompt = win1251_to_utf8(prompt);
+        
         systemPrompt = win1251_to_utf8(systemPrompt);
         result = sendPrompt();
         result = parseResponse(result);
-        result = utf8_to_win1251(result);
+        
+        // Нужен utf-8
+        //result = utf8_to_win1251(result);
     }
 
     bool setRating() {

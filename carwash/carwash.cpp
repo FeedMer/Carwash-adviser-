@@ -24,7 +24,8 @@ void gd() {
 
 int main() {
     setlocale(LC_ALL, "Russian");
-
+    cout << "Запуск бота..." << endl;
+ 
     //---request example---
     //MeteoblueConnector mbc = MeteoblueConnector(56.84, 53.20);    // ширина и долгота (для ижевска: 56.84, 53.20)
     //vector<Weather> ws = mbc.getWeathers(5);                      // аргумент колво дней для запроса

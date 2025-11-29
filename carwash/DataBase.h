@@ -41,11 +41,17 @@ public:
 
     // Установка статуса пользователя (1 - активный, 0 - неактивный)
     bool setUserStatus(string telegramId, int status) {
-        auto session = sqlConnection();
-        auto query = session.sql("INSERT INTO users_status(telegram_id, status) VALUES (?, ?)");
-        query.bind(telegramId, status);
-        query.execute();
-        return true;
+        try {
+            auto session = sqlConnection();
+            auto query = session.sql("INSERT INTO users_status(telegram_id, status) VALUES (?, ?)");
+            query.bind(telegramId, status);
+            query.execute();
+            return true;
+        }
+        catch (const mysqlx::Error& err) {
+            cout << "Error: " << err.what() << std::endl;
+        }
+        return false;
     }
 
     // Добавление информации об отправленном сообщении
