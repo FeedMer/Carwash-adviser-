@@ -2,6 +2,10 @@
 #include <string>
 #include <json.hpp>
 #include <curl/curl.h>
+#include "WeatherApi.h"
+#include <fstream>
+#include <sstream>
+#include <iostream>
 
 using json = nlohmann::json;
 using namespace std;
@@ -25,6 +29,27 @@ static std::string win1251_to_utf8(const std::string& win1251_str) {
     return utf8_str;
 }
 
+// Конвертация из UTF-8 в Windows-1251
+static std::string utf8_to_win1251(const std::string& utf8_str) {
+    // Сначала конвертируем UTF-8 в wide string (UTF-16)
+    int wlen = MultiByteToWideChar(CP_UTF8, 0, utf8_str.c_str(), -1, NULL, 0);
+    if (wlen == 0) return utf8_str;
+
+    std::wstring wide_str(wlen, 0);
+    MultiByteToWideChar(CP_UTF8, 0, utf8_str.c_str(), -1, &wide_str[0], wlen);
+
+    // Затем конвертируем wide string в Windows-1251
+    int ulen = WideCharToMultiByte(1251, 0, wide_str.c_str(), -1, NULL, 0, NULL, NULL);
+    if (ulen == 0) return utf8_str;
+
+    std::string win1251_str(ulen, 0);
+    WideCharToMultiByte(1251, 0, wide_str.c_str(), -1, &win1251_str[0], ulen, NULL, NULL);
+
+    // Убираем нулевой терминатор
+    win1251_str.pop_back();
+    return win1251_str;
+}
+
 // Callback функция для записи ответа
 static size_t WriteCallback1(void* contents, size_t size, size_t nmemb, std::string* response) {
     size_t totalSize = size * nmemb;
@@ -37,6 +62,7 @@ public:
     std::string systemPrompt;
     std::string prompt;
     std::string result;
+    bool toWash = false; // Определяем нужно ли мыть машину
     
 private:
     std::string api_key_;
@@ -46,8 +72,9 @@ private:
 public:
     DeepseekAPI() {
         // Чтобы сайт не забанил, нужно ключ "спрятать"
-        api_key_ = "";
-        api_key_ += "";
+        ifstream filekey("chatgpt-key.txt");
+        filekey >> api_key_;
+        filekey.close();
     }
 
     std::string sendPrompt() {
@@ -147,22 +174,84 @@ public:
                         "27.09; 11 градусов; Погода ясная";
         return result;
     }
+
+    string weather() {
+        MeteoblueConnector mbc = MeteoblueConnector(56.84, 53.20);    // ширина и долгота (для ижевска: 56.84, 53.20)
+        vector<Weather> ws = mbc.getWeathers(5);                      // аргумент колво дней для запроса
+        std::stringstream result;
+        for (int i = 0; i < 5; i++) {
+            result << ws[i] << endl;
+        }
+        return result.str();
+    }
     
     void main() {
         systemPrompt = "Ты автолюбитель. Тебе нравится держать машину в чистоте, но не нравится, что после чистки машины сразу пошёл дождь."
                        "В тексте ответа не используй дополнительных символов."
                        "Текст ответа ограничен 256 символами. Нужно пояснение с описанием погоды."
                        "Нужна оценка от 1 до 10."
-                       "Ты живешь в Ижевске. Ответ дай на английском.";
+                       "Ты живешь в городе Ижевск. В начале напиши 'Оценка: n из 10', а после этого стоит ли мыть машину.";
 
         prompt = "Тебе необходимо на основании информации о погоде решить стоит ли тебе мыть машину сегодня."
                  "Вот погодные условия на следующие дни. "
-                 + ГрустнаяПогода();
+                 + weather();
 
         prompt = win1251_to_utf8(prompt);
         systemPrompt = win1251_to_utf8(systemPrompt);
         result = sendPrompt();
         result = parseResponse(result);
+        result = utf8_to_win1251(result);
+
+        setRating();
+
+        if (toWash) {
+            cout << "Машину стоит мыть.\n";
+        }
+        else {
+            cout << "Машину не стоит мыть.\n";
+        }
+    }
+
+    void texting(string& text) {
+        systemPrompt = "Ты автолюбитель. Твой собеседник тоже автолюбитель. Вы общаетесь на тему авто. На другие вопросы отнекивайся";
+        prompt = text;
+
+        prompt = win1251_to_utf8(prompt);
+        systemPrompt = win1251_to_utf8(systemPrompt);
+        result = sendPrompt();
+        result = parseResponse(result);
+        result = utf8_to_win1251(result);
+    }
+
+    bool setRating() {
+        const std::string prefix = "Оценка: ";
+
+        // Правильная проверка начала строки
+        if (result.compare(0, prefix.length(), prefix) != 0) {
+            return false;
+        }
+
+        // Извлекаем подстроку после префикса
+        std::string numberStr = result.substr(prefix.length(), 2);
+        if (!(numberStr[1] >= '0' && numberStr[1] <= '9')) {
+            numberStr = { numberStr[0] };
+        }
+
+        try {
+            // Пытаемся преобразовать в число
+            int rating = std::stoi(numberStr);
+
+            // Проверяем, что число от 1 до 99 (1-2 знака)
+            if (rating < 1 || rating > 99) {
+                return false;
+            }
+
+            toWash = rating >= 7;
+            return true;
+        }
+        catch (const std::exception& e) {
+            return false;
+        }
     }
 };
 

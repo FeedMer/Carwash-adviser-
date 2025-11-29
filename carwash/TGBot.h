@@ -46,10 +46,14 @@ private:
     void curlPost(const std::string& url, const std::string& data) {
         CURL* curl = curl_easy_init();
         if (curl) {
+            // НАСТРОЙКИ SSL
+            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L); // Отключить проверку сертификата
+            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L); // Отключить проверку хоста
+
             curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
             curl_easy_setopt(curl, CURLOPT_POST, 1L);
             curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
-            curl_easy_perform(curl);
+            auto res = curl_easy_perform(curl);
             curl_easy_cleanup(curl);
         }
     }
@@ -151,6 +155,9 @@ private:
                 }
                 if (userNameForDb.empty()) userNameForDb = "User_" + std::to_string(chatId);
 
+                //text = utf8_to_win1251(text);
+                cout << "\nТекст сообщения пользователя: " + text << '\n';
+
                 if (text == "/start") {
                     db.addTelegramUser(std::to_string(chatId), userNameForDb);
                     sendMessage(chatId, u8"Привет! Мне нужно узнать твоё местоположение:", locationRequestKeyboard());
@@ -159,8 +166,8 @@ private:
                     sendMessage(chatId, u8"Спасибо! Местоположение сохранено.", mainMenu());
                 }
                 else if (text == u8"Стоит ли мыть сегодня?") {
-                    //sendMessage(chatId, u8"Пока не сделано", mainMenu());
-                    sendMessage(chatId, ds.result, mainMenu());
+                    ds.main();
+                    sendMessage(chatId, win1251_to_utf8(ds.result), mainMenu());
                 }
                 else if (text == u8"Я помыл машину") {
                     sendMessage(chatId, u8"Окей!", mainMenu());
@@ -204,10 +211,15 @@ public:
             std::string payloadStr = payload.dump();
             struct curl_slist* headers = nullptr;
             headers = curl_slist_append(headers, "Content-Type: application/json");
+            
+            // НАСТРОЙКИ SSL
+            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L); // Отключить проверку сертификата
+            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L); // Отключить проверку хоста
+
             curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
             curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
             curl_easy_setopt(curl, CURLOPT_POSTFIELDS, payloadStr.c_str());
-            curl_easy_perform(curl);
+            auto res = curl_easy_perform(curl);
             curl_slist_free_all(headers);
             curl_easy_cleanup(curl);
         }

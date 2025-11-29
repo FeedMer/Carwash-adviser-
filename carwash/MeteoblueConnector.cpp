@@ -5,6 +5,15 @@
 #include <string>
 using namespace std;
 
+#include <sstream>
+#include <iomanip>
+
+std::string doubleToString(double value, int precision = 2) {
+    std::stringstream ss;
+    ss << std::fixed << std::setprecision(precision) << value;
+    return ss.str();
+}
+
 size_t MeteoblueConnector::writeCallback(void* contents, size_t size, size_t nmemb, void* userp) {
     ((std::string*)userp)->append((char*)contents, size * nmemb);
     return size * nmemb;
@@ -34,8 +43,8 @@ string MeteoblueConnector::makeRequest(int forecast) {
 
 
     string url = LINK + API_KEY
-        + "&lat=" + to_string(latitude)
-        + "&lon=" + to_string(longitude)
+        + "&lat=" + doubleToString(latitude)
+        + "&lon=" + doubleToString(longitude)
         + "&forecast_days=" + to_string(forecast);
 
     string readBuffer;
