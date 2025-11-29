@@ -115,7 +115,8 @@ private:
                 ds2.main();
                 if (ds2.toWash) {
                     for (auto user : users) {
-                        sendMessage(stoll(user.telegramId), win1251_to_utf8(ds.result));
+                        db.addMessage(user.telegramId, win1251_to_utf8(ds2.prompt), win1251_to_utf8(ds2.result));
+                        sendMessage(stoll(user.telegramId), win1251_to_utf8(ds2.result));
                     }
                 }
             }
@@ -179,6 +180,7 @@ private:
                 }
                 else if (text == u8"Стоит ли мыть сегодня?") {
                     ds.main();
+                    db.addMessage(to_string(chatId), win1251_to_utf8(ds.prompt), win1251_to_utf8(ds.result));
                     sendMessage(chatId, win1251_to_utf8( ds.result), mainMenu());
                 }
                 else if (text == u8"Я помыл машину") {

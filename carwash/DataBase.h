@@ -56,11 +56,17 @@ public:
 
     // Добавление информации об отправленном сообщении
     bool addMessage(string telegramId, string prompt, string result) {
-        auto session = sqlConnection();
-        auto query = session.sql("INSERT INTO sending_messages(telegram_id, prompt, result) VALUES (?, ?, ?)");
-        query.bind(telegramId, prompt, result);
-        query.execute();
-        return true;
+        try {
+            auto session = sqlConnection();
+            auto query = session.sql("INSERT INTO sending_messages(telegram_id, prompt, result) VALUES (?, ?, ?)");
+            query.bind(telegramId, prompt, result);
+            query.execute();
+            return true;
+        }
+        catch (const mysqlx::Error& err) {
+            cout << "Error: " << err.what() << std::endl;
+        }
+        return false;
     }
 
     // Посмотреть список пользователей
@@ -137,10 +143,12 @@ public:
         vector <TelegramUser> users;
         string queryText =
             R"(SELECT 
-                    telegram_id,
-                    name,
-                    status,
-                    formatted_date
+                    ranked.telegram_id,
+                    ranked.name,
+                    ranked.status,
+                    ranked.formatted_date,
+                    sm.last_message_date,
+                    DATE_FORMAT(sm.last_message_date, '%d.%m.%y %H:%i') as last_message_formatted
                 FROM (
                     SELECT
                         telegram_users.telegram_id,
@@ -156,7 +164,16 @@ public:
                         LEFT JOIN users_status AS users_status
                             ON telegram_users.telegram_id = users_status.telegram_id
                 ) AS ranked
-                WHERE _row_number <= 1 AND status = 1)";
+                LEFT JOIN (
+                    SELECT 
+                        telegram_id,
+                        MAX(date) as last_message_date
+                    FROM sending_messages
+                    GROUP BY telegram_id
+                ) AS sm ON ranked.telegram_id = sm.telegram_id
+                WHERE ranked._row_number = 1 
+                    AND ranked.status = 1
+                    AND (sm.last_message_date IS NULL OR sm.last_message_date < NOW() - INTERVAL 1 HOUR))";
 
         try {
             auto session = sqlConnection();
