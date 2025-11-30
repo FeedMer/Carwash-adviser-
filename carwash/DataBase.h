@@ -2,6 +2,7 @@
 #include <mysqlx/xdevapi.h>
 #include <vector>
 #include <iostream>
+#include <fstream>
 using namespace std;
 
 struct TelegramUser {
@@ -13,8 +14,13 @@ public:
 
 class DataBase{
 public:
-    DataBase() {
+    int mailingFrequency = 0;
 
+    DataBase() {
+        ifstream filekey("mailingFrequency.txt");
+        filekey >> mailingFrequency;
+        filekey.close();
+        cout << "mailingFrequency=" << mailingFrequency << endl;
     }
 
     // Создание подключения к базе данных
@@ -173,11 +179,12 @@ public:
                 ) AS sm ON ranked.telegram_id = sm.telegram_id
                 WHERE ranked._row_number = 1 
                     AND ranked.status = 1
-                    AND (sm.last_message_date IS NULL OR sm.last_message_date < NOW() - INTERVAL 1 HOUR))";
+                    AND (sm.last_message_date IS NULL OR sm.last_message_date < NOW() - INTERVAL ? HOUR))";
 
         try {
             auto session = sqlConnection();
             auto query = session.sql(queryText);
+            query.bind(mailingFrequency);
             mysqlx::SqlResult result = query.execute();
 
             while (auto row = result.fetchOne()) {
