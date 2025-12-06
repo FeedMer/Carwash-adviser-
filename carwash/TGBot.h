@@ -78,8 +78,8 @@ private:
             {"keyboard", json::array({
                 json::array({ u8"Стоит ли мыть сегодня?" }),
                 json::array({ u8"Я помыл машину" }),
-                json::array({ u8"Отписаться от уведомлений" }),
-                json::array({ u8"Настройки" })
+                json::array({ u8"Активировать/Отключить уведомления" })
+                /*json::array({ u8"Настройки" })*/
             })},
             {"resize_keyboard", true}
         };
@@ -88,27 +88,22 @@ private:
     void notificationThread() {
         cout << "Запуск цикла" << endl;
         const int TARGET_DAY = 1;
-        bool sentToday = false;
+
         DeepseekAPI ds2;
 
         while (running) {
-            //time_t now = time(nullptr);
-            //tm localTime;
-            //localtime_s(&localTime, &now);
-            //int weekday = localTime.tm_wday;
-            //int hour = localTime.tm_hour;
-            //int minute = localTime.tm_min;
+            time_t now = time(nullptr);
+            tm localTime;
 
-            //if (hour == 0 && minute == 0)
-            //    sentToday = false;
+            //это время на серваке, а не локальное время пользователя (?)
+            localtime_s(&localTime, &now);
+            int weekday = localTime.tm_wday;
+            int hour = localTime.tm_hour;
+            int minute = localTime.tm_min;
 
-            //if (!sentToday) {  // тест уведомлений
-            //if (!sentToday && weekday == TARGET_DAY && hour == 9 && minute == 00) {
-            //    for (auto chatId : db.usersForMailing()) {
-            //        //sendMessage(chatId.telegramId, u8"Напоминание! Сегодня время помыть машину");
-            //    }
-            //    sentToday = true;
-            //}
+            if (hour == 0 && minute == 0) {
+                db.updateAllLastSent();
+            }
 
             auto users = db.usersForMailing();
             if (users.size() > 0) {
@@ -152,7 +147,7 @@ private:
                 auto message = update["message"];
                 long long chatId = message["chat"]["id"].get<long long>();
                 std::string text = message.contains("text") ? message["text"].get<std::string>() : "";
-                
+
                 std::string username = "";
                 std::string firstName = "";
                 if (message["from"].contains("username") && !message["from"]["username"].is_null()) {
@@ -168,38 +163,33 @@ private:
                 }
                 if (userNameForDb.empty()) userNameForDb = "User_" + std::to_string(chatId);
 
-                //text = utf8_to_win1251(text);
                 cout << endl << "Текст сообщения пользователя: " + utf8_to_win1251(text) << endl;
 
-                if (text == "/start") {
-                    db.addTelegramUser(std::to_string(chatId), userNameForDb);
-                    sendMessage(chatId, u8"Привет! Мне нужно узнать твоё местоположение:", locationRequestKeyboard());
-                }
-                else if (message.contains("location")) {
-                    sendMessage(chatId, u8"Спасибо! Местоположение сохранено.", mainMenu());
+                if (!db.haveTgUser(std::to_string(chatId))) {
+                    sendMessage(chatId, u8"Привет!");
                 }
                 else if (text == u8"Стоит ли мыть сегодня?") {
                     ds.main();
                     db.addMessage(to_string(chatId), win1251_to_utf8(ds.prompt), win1251_to_utf8(ds.result));
-                    sendMessage(chatId, win1251_to_utf8( ds.result), mainMenu());
+                    sendMessage(chatId, win1251_to_utf8(ds.result), mainMenu());
                 }
                 else if (text == u8"Я помыл машину") {
                     sendMessage(chatId, u8"Окей!", mainMenu());
+                    db.dropLastSent(to_string(chatId));
                 }
-                else if (text == u8"Отписаться от уведомлений") {
+                else if (text == u8"Активировать/Отключить уведомления") {
                     if (db.setUserStatus(std::to_string(chatId), 0))
                         sendMessage(chatId, u8"Хорошо, уведомления временно отключены.", mainMenu());
-                }
-                else if (text == u8"Настройки") {
-                    sendMessage(chatId, u8"Введите новый город или отправьте геолокацию.", locationRequestKeyboard());
+                    else if (db.setUserStatus(std::to_string(chatId), 1)) {
+                        sendMessage(chatId, u8"Уведомления включены!", mainMenu());
+                    }
+                    else {
+                        cout << "Error with notification system! \"Activating/Deactivating notifications\" error" << endl;
+                    }
                 }
                 else if (!text.empty()) {
                     ds.texting(text);
                     sendMessage(chatId, ds.result, mainMenu());
-                }
-                // Этот код слишком сомнительный, его надо переделать
-                else if (!text.empty()) {
-                    sendMessage(chatId, u8"Спасибо! Город сохранён.", mainMenu());
                 }
             }
 
@@ -230,7 +220,7 @@ public:
             std::string payloadStr = payload.dump();
             struct curl_slist* headers = nullptr;
             headers = curl_slist_append(headers, "Content-Type: application/json");
-            
+
             // НАСТРОЙКИ SSL
             curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L); // Отключить проверку сертификата
             curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L); // Отключить проверку хоста

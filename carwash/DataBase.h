@@ -12,7 +12,7 @@ public:
     int status = 0;
 };
 
-class DataBase{
+class DataBase {
 public:
     int mailingFrequency = 0;
 
@@ -28,6 +28,34 @@ public:
         mysqlx::Session session("mysqlx://remote_root:123@MySQL-8.4:33060/carwash");
         cout << "Connected to MySQL successfully!" << endl;
         return session;
+    }
+
+    bool haveTgUser(string telegramId) {
+        try {
+            return sqlConnection().sql("select count(*) from telegram_users where telegram_id = ?").bind(telegramId).execute().fetchOne()[0].get<int>() != 0;
+        }
+        catch (const mysqlx::Error& err) {
+            cout << "Error: " << err.what() << std::endl;
+        }
+        return false;
+    }
+
+    void updateAllLastSent() {
+        try {
+            sqlConnection().sql("update users_statues set last_sent = last_sent + 1").execute();
+        }
+        catch (const mysqlx::Error& err) {
+            cout << "Error: " << err.what() << std::endl;
+        }
+    }
+
+    void dropLastSent(string telegramId) {
+        try {
+            sqlConnection().sql("update users_status set last_sent = 0 where telegram_id = ?").bind(telegramId).execute();
+        }
+        catch (const mysqlx::Error& err) {
+            cout << "Error: " << err.what() << std::endl;
+        }
     }
 
     // Добавление телеграм пользователя
@@ -77,7 +105,7 @@ public:
 
     // Посмотреть список пользователей
     void outTelegramUsers() {
-        string queryText = 
+        string queryText =
             R"(SELECT 
                     telegram_users.telegram_id,
                     telegram_users.name,
