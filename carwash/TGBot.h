@@ -18,6 +18,7 @@ private:
     DeepseekAPI ds;
     std::string bot_token;
     std::string api_url;
+    TelegramUser curUser;
     bool running;
 
     static size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* output) {
@@ -74,12 +75,17 @@ private:
     }
 
     json mainMenu() {
+        auto btnNotification = json::array({ u8"Отписаться от уведомлений" });
+        if (curUser.status == 0) {
+            btnNotification = json::array({ u8"Подписаться на уведомления" });
+        }
+
         return {
             {"keyboard", json::array({
                 json::array({ u8"Стоит ли мыть сегодня?" }),
                 json::array({ u8"Я помыл машину" }),
-                json::array({ u8"Отписаться от уведомлений" }),
-                json::array({ u8"Настройки" })
+                btnNotification,
+                //json::array({ u8"Настройки" })
             })},
             {"resize_keyboard", true}
         };
@@ -171,6 +177,8 @@ private:
                 //text = utf8_to_win1251(text);
                 cout << endl << "Текст сообщения пользователя: " + utf8_to_win1251(text) << endl;
 
+                curUser = db.getUser(to_string(chatId));
+
                 if (text == "/start") {
                     db.addTelegramUser(std::to_string(chatId), userNameForDb);
                     sendMessage(chatId, u8"Привет! Мне нужно узнать твоё местоположение:", locationRequestKeyboard());
@@ -181,14 +189,25 @@ private:
                 else if (text == u8"Стоит ли мыть сегодня?") {
                     ds.main();
                     db.addMessage(to_string(chatId), win1251_to_utf8(ds.prompt), win1251_to_utf8(ds.result));
-                    sendMessage(chatId, win1251_to_utf8( ds.result), mainMenu());
+                    sendMessage(chatId, win1251_to_utf8(ds.result), mainMenu());
                 }
                 else if (text == u8"Я помыл машину") {
+                    curUser.status = 0;
                     sendMessage(chatId, u8"Окей!", mainMenu());
+                    db.setUserStatus(to_string(chatId), 0);
+                    db.setUserStatus(to_string(chatId), 1, 2); // Включаем активность через два дня
                 }
                 else if (text == u8"Отписаться от уведомлений") {
-                    if (db.setUserStatus(std::to_string(chatId), 0))
+                    if (db.setUserStatus(std::to_string(chatId), 0)) {
+                        curUser.status = 0;
                         sendMessage(chatId, u8"Хорошо, уведомления временно отключены.", mainMenu());
+                    }
+                }
+                else if (text == u8"Подписаться на уведомления") {
+                    if (db.setUserStatus(std::to_string(chatId), 1)) {
+                        curUser.status = 1;
+                        sendMessage(chatId, u8"Уведомления снова включены.", mainMenu());
+                    }
                 }
                 else if (text == u8"Настройки") {
                     sendMessage(chatId, u8"Введите новый город или отправьте геолокацию.", locationRequestKeyboard());

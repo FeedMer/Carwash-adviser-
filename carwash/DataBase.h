@@ -10,6 +10,7 @@ public:
     string telegramId;
     string name;
     int status = 0;
+    bool isEmpty = true;
 };
 
 class DataBase{
@@ -46,11 +47,12 @@ public:
     }
 
     // Установка статуса пользователя (1 - активный, 0 - неактивный)
-    bool setUserStatus(string telegramId, int status) {
+    bool setUserStatus(string telegramId, int status, int forDay = 0) {
         try {
             auto session = sqlConnection();
-            auto query = session.sql("INSERT INTO users_status(telegram_id, status) VALUES (?, ?)");
-            query.bind(telegramId, status);
+            auto query = session.sql("INSERT INTO users_status(telegram_id, status, date) "
+                                     "VALUES (?, ?, DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL ? DAY))");
+            query.bind(telegramId, status, forDay);
             query.execute();
             return true;
         }
@@ -113,6 +115,7 @@ public:
                     telegram_users
                     LEFT JOIN users_status
                         ON telegram_users.telegram_id = users_status.telegram_id
+                        AND users_status.date <= CURRENT_TIMESTAMP()
                 WHERE
                     telegram_users.telegram_id = ?
                 ORDER BY 
@@ -128,6 +131,7 @@ public:
             if (auto row = result.fetchOne()) {
                 user.telegramId = string(row[0]);
                 user.name = string(row[1]);
+                user.isEmpty = false;
                 if (!row[2].isNull()) {
                     user.status = row[2];
                 }
@@ -169,6 +173,7 @@ public:
                         telegram_users AS telegram_users
                         LEFT JOIN users_status AS users_status
                             ON telegram_users.telegram_id = users_status.telegram_id
+                            AND users_status.date <= CURRENT_TIMESTAMP()
                 ) AS ranked
                 LEFT JOIN (
                     SELECT 
