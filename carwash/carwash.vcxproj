@@ -139,13 +139,25 @@
     <ClCompile Include="MeteoApiConnector.cpp" />
     <ClCompile Include="MeteoblueConnector.cpp" />
     <ClCompile Include="Weather.cpp" />
+    <ClCompile Include="YandexWeatherParser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DataBase.h" />
     <ClInclude Include="DeepseekAPI.h" />
     <ClInclude Include="WeatherApi.h" />
+    <ClInclude Include="YandexWeatherParser.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\libxml2.vcpkg.2.14.5\build\native\libxml2.vcpkg.targets" Condition="Exists('..\packages\libxml2.vcpkg.2.14.5\build\native\libxml2.vcpkg.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\libxml2.vcpkg.2.14.5\build\native\libxml2.vcpkg.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libxml2.vcpkg.2.14.5\build\native\libxml2.vcpkg.targets'))" />
+  </Target>
 </Project>

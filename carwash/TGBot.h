@@ -181,7 +181,8 @@ private:
 
                 if (text == "/start") {
                     db.addTelegramUser(std::to_string(chatId), userNameForDb);
-                    sendMessage(chatId, u8"Привет! Мне нужно узнать твоё местоположение:", locationRequestKeyboard());
+                    //sendMessage(chatId, u8"Привет! Мне нужно узнать твоё местоположение:", locationRequestKeyboard());
+                    sendMessage(chatId, u8"Привет! Бот активирован, теперь будут приходить регулярные оповещения, когда стоит помыть машину!", mainMenu());
                 }
                 else if (message.contains("location")) {
                     sendMessage(chatId, u8"Спасибо! Местоположение сохранено.", mainMenu());

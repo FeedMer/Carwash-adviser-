@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include "YandexWeatherParser.h"
 
 using json = nlohmann::json;
 using namespace std;
@@ -185,6 +186,36 @@ public:
         return result.str();
     }
     
+    string yaWeather() {
+        YandexWeatherParser parser;
+        string weatherData;
+
+        std::string url = "https://yandex.ru/pogoda/ru/izhevsk?lat=56.852755&lon=53.207017";
+
+        std::cout << "Loading weather data from: " << url << std::endl;
+
+        if (parser.LoadPage(url)) {
+            std::cout << "Page loaded successfully!" << std::endl;
+
+            weatherData = parser.ParseWeatherData();
+
+            std::cout << "\nParsed weather data:\n";
+            std::cout << weatherData << std::endl;
+
+            // Можно также сохранить в файл
+            // std::ofstream file("weather_data.txt");
+            // file << weatherData;
+            // file.close();
+
+        }
+        else {
+            std::cerr << "Failed to load page" << std::endl;
+            return weatherData;
+        }
+
+        return weatherData;
+    }
+
     void main() {
         systemPrompt = "Ты автолюбитель. Тебе нравится держать машину в чистоте, но не нравится, что после чистки машины сразу пошёл дождь."
                        "В тексте ответа не используй дополнительных символов."
@@ -192,9 +223,13 @@ public:
                        "Нужна оценка от 1 до 10."
                        "Ты живешь в городе Ижевск. В начале напиши 'Оценка: n из 10', а после этого стоит ли мыть машину.";
 
+        string strWeather = yaWeather();
+        if (strWeather == "")
+            strWeather = weather();
+
         prompt = "Тебе необходимо на основании информации о погоде решить стоит ли тебе мыть машину сегодня."
                  "Вот погодные условия на следующие дни. "
-                 + weather();
+                 + strWeather;
 
         prompt = win1251_to_utf8(prompt);
         systemPrompt = win1251_to_utf8(systemPrompt);
